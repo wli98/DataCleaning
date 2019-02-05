@@ -63,7 +63,20 @@ def findMatchings(sampleList, ErrFunc):
 
     return optMatching
 
-def plotErrors(ErrFunc):
+def findMatchingsSimple(sampleList):
+    optMatching = []
+    firstAbbrev = ''
+    for name in sampleList:
+        if name in labels:
+            firstAbbrev = name
+            break
+    if firstAbbrev != '':
+        for x in sampleList:
+            optMatching.append([x,firstAbbrev])
+    return optMatching
+
+
+def getErrors(ErrFunc):
     sampleSize = []
     errors = []
     for i in range(20, 659):
@@ -77,6 +90,20 @@ def plotErrors(ErrFunc):
         })
     return errorFrame
 
-errors = plotErrors(simpleError)
+def getErrorsSimple():
+    sampleSize = []
+    errors = []
+    for i in range(20, len(countryNames)):
+        sample = takeSample(i)
+        matching = findMatchingsSimple(sample)
+        sampleSize.append(i)
+        errors.append(simpleError(countryNames, matching) - simpleError(sample, matching))
+    errorFrame = pd.DataFrame({
+        'Sample Size':sampleSize,
+        'Error Difference':errors
+        })
+    return errorFrame
+
+errors = getErrorsSimple()
 errors.plot(x = 'Sample Size', y = 'Error Difference')
 plt.show()
